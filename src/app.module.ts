@@ -6,6 +6,7 @@ import { validationSchema } from './config/validation.js';
 import { HealthModule } from './health/health.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SeedModule } from './seed/seed.module.js';
+import { MessagesModule } from './messages/messages.module.js';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SeedModule } from './seed/seed.module.js';
     }),
     AuthModule,
     SeedModule,
+    MessagesModule,
     HealthModule,
   ],
 })
