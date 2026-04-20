@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import configuration from './config/configuration.js';
 import { validationSchema } from './config/validation.js';
 import { HealthModule } from './health/health.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { SeedModule } from './seed/seed.module.js';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { HealthModule } from './health/health.module.js';
         uri: config.get<string>('mongodb.uri'),
       }),
     }),
+    AuthModule,
+    SeedModule,
     HealthModule,
   ],
 })

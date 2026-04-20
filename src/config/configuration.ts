@@ -9,4 +9,7 @@ export default () => ({
   elasticsearch: {
     url: process.env['ELASTICSEARCH_URL'] ?? 'http://localhost:9200',
   },
+  jwt: {
+    secret: process.env['JWT_SECRET'] ?? 'dev-secret',
+  },
 });
