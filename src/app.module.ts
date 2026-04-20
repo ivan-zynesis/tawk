@@ -7,6 +7,7 @@ import { HealthModule } from './health/health.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SeedModule } from './seed/seed.module.js';
 import { MessagesModule } from './messages/messages.module.js';
+import { SearchModule } from './search/search.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { MessagesModule } from './messages/messages.module.js';
     AuthModule,
     SeedModule,
     MessagesModule,
+    SearchModule,
     HealthModule,
   ],
 })
