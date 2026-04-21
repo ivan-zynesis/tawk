@@ -1,7 +1,10 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserTenant, UserTenantDocument } from '../auth/schemas/user-tenant.schema.js';
+import {
+  UserTenant,
+  UserTenantDocument,
+} from '../auth/schemas/user-tenant.schema.js';
 
 export const SEED_DATA = {
   tenants: [

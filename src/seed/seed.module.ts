@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserTenant, UserTenantSchema } from '../auth/schemas/user-tenant.schema.js';
+import {
+  UserTenant,
+  UserTenantSchema,
+} from '../auth/schemas/user-tenant.schema.js';
 import { SeedService } from './seed.service.js';
 
 @Module({

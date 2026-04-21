@@ -31,7 +31,10 @@ export class SearchService implements OnModuleInit {
 
   constructor(configService: ConfigService) {
     this.client = new Client({
-      node: configService.get<string>('elasticsearch.url', 'http://localhost:9200'),
+      node: configService.get<string>(
+        'elasticsearch.url',
+        'http://localhost:9200',
+      ),
     });
   }
 
@@ -70,10 +73,7 @@ export class SearchService implements OnModuleInit {
       query: {
         bool: {
           must: [{ match: { body: query } }],
-          filter: [
-            { term: { tenantId } },
-            { term: { conversationId } },
-          ],
+          filter: [{ term: { tenantId } }, { term: { conversationId } }],
         },
       },
       sort: [{ timestamp: { order: 'desc' } }],

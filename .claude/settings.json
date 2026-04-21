@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout -b opsx/message-management-platform/search-and-tests)",
+      "Bash(git add src/messages/messages.controller.ts src/messages/messages.module.ts src/messages/dto/search-messages-query.dto.ts src/messages/messages.service.spec.ts src/auth/auth.service.spec.ts src/auth/tenant.guard.spec.ts src/search/search.service.spec.ts openspec/changes/search-and-tests/ package.json)",
+      "Bash(git merge opsx/message-management-platform/search-and-tests)"
+    ]
+  }
+}
