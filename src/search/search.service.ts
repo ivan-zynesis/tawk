@@ -54,10 +54,11 @@ export class SearchService implements OnModuleInit {
   }
 
   async indexMessage(message: IndexedMessage): Promise<void> {
+    const { id, tenantId, conversationId, senderId, body, timestamp } = message;
     await this.client.index({
       index: INDEX_NAME,
-      id: message.id,
-      document: message,
+      id,
+      document: { id, tenantId, conversationId, senderId, body, timestamp },
     });
   }
 

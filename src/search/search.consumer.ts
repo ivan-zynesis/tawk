@@ -21,7 +21,10 @@ export class SearchConsumer implements OnModuleInit, OnModuleDestroy {
       clientId: 'tawk-search-consumer',
       brokers: configService.get<string[]>('kafka.brokers', ['localhost:9092']),
     });
-    this.consumer = kafka.consumer({ groupId: 'search-indexer' });
+    this.consumer = kafka.consumer({
+      groupId: 'search-indexer',
+      allowAutoTopicCreation: true,
+    });
   }
 
   async onModuleInit() {

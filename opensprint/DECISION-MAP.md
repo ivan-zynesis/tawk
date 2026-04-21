@@ -9,8 +9,10 @@ DS-MULTI-TENANT (driver)
   └── DEC-003: JWT + user-tenant auth [depth=0]
 
 DS-TECH-STACK (driver)
-  └── DEC-002: Best-effort Kafka publish [depth=0]
-        └── DEC-004: Single topic, partition by conversationId [depth=1]
+  ├── DEC-002: Best-effort Kafka publish [depth=0]
+  │     └── DEC-004: Single topic, partition by conversationId [depth=1]
+  ├── DEC-005: Testcontainers-based integration testing [depth=0]
+  └── DEC-006: Vitest + SWC for test runner [depth=0]
 ```
 
 ## Blast Radius
@@ -18,5 +20,5 @@ DS-TECH-STACK (driver)
 | If this changes... | These are invalidated |
 |---|---|
 | DS-MULTI-TENANT | DEC-001, DEC-003 |
-| DS-TECH-STACK | DEC-002, DEC-004 |
+| DS-TECH-STACK | DEC-002, DEC-004, DEC-005, DEC-006 |
 | DEC-002 | DEC-004 |

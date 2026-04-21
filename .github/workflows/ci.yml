@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Restore Docker image cache
+        id: docker-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/docker-images.tar
+          key: docker-images-mongo7-kafka750-es811
+
+      - name: Load cached Docker images
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: docker load < /tmp/docker-images.tar
+
+      - name: Pull and cache Docker images
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          docker pull mongo:7
+          docker pull confluentinc/cp-kafka:7.5.0
+          docker pull docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+          docker save \
+            mongo:7 \
+            confluentinc/cp-kafka:7.5.0 \
+            docker.elastic.co/elasticsearch/elasticsearch:8.11.0 \
+            > /tmp/docker-images.tar
+
+      - name: Integration tests
+        run: npm run test:integration
+        env:
+          TESTCONTAINERS_RYUK_DISABLED: 'true'

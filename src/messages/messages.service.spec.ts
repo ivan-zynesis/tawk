@@ -5,15 +5,15 @@ import { MessagesService } from './messages.service.js';
 import { Message } from './schemas/message.schema.js';
 
 const mockProducer = {
-  connect: jest.fn(),
-  disconnect: jest.fn(),
-  send: jest.fn(),
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  send: vi.fn(),
 };
 
-jest.mock('kafkajs', () => ({
-  Kafka: jest.fn().mockImplementation(() => ({
-    producer: () => mockProducer,
-  })),
+vi.mock('kafkajs', () => ({
+  Kafka: function () {
+    return { producer: () => mockProducer };
+  },
 }));
 
 describe('MessagesService', () => {
@@ -27,19 +27,23 @@ describe('MessagesService', () => {
     body: 'Hello world',
     timestamp: '2026-04-21T00:00:00.000Z',
     toObject: function () {
-      const { toObject, save, ...rest } = this;
+      const { ...rest } = this;
       return rest;
     },
-    save: jest.fn(),
+    save: vi.fn(),
   };
 
   savedMessage.save.mockResolvedValue(savedMessage);
 
-  const mockModel = jest.fn().mockImplementation(() => savedMessage) as any;
-  mockModel.find = jest.fn().mockReturnValue({
-    sort: jest.fn().mockReturnValue({
-      limit: jest.fn().mockReturnValue({
-        lean: jest.fn().mockResolvedValue([
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const mockModel = function () {
+    return savedMessage;
+  } as any;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  mockModel.find = vi.fn().mockReturnValue({
+    sort: vi.fn().mockReturnValue({
+      limit: vi.fn().mockReturnValue({
+        lean: vi.fn().mockResolvedValue([
           {
             id: 'msg-1',
             tenantId: 'tenant-alpha',
@@ -54,17 +58,18 @@ describe('MessagesService', () => {
   });
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     savedMessage.save.mockResolvedValue(savedMessage);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MessagesService,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         { provide: getModelToken(Message.name), useValue: mockModel },
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn().mockReturnValue(['localhost:9092']),
+            get: vi.fn().mockReturnValue(['localhost:9092']),
           },
         },
       ],
@@ -120,6 +125,7 @@ describe('MessagesService', () => {
 
       expect(result.messages).toHaveLength(1);
       expect(result.nextCursor).toBeNull();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(mockModel.find).toHaveBeenCalledWith({
         tenantId: 'tenant-alpha',
         conversationId: 'conv-1',
@@ -134,6 +140,7 @@ describe('MessagesService', () => {
         '2026-04-20T00:00:00.000Z',
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       expect(mockModel.find).toHaveBeenCalledWith({
         tenantId: 'tenant-alpha',
         conversationId: 'conv-1',

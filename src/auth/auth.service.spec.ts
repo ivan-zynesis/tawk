@@ -7,11 +7,11 @@ describe('AuthService', () => {
   let service: AuthService;
 
   const mockUserTenantModel = {
-    findOne: jest.fn(),
+    findOne: vi.fn(),
   };
 
   beforeEach(async () => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -29,7 +29,7 @@ describe('AuthService', () => {
   describe('findTenantByUserId', () => {
     it('should return tenantId when user-tenant mapping exists', async () => {
       mockUserTenantModel.findOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue({
+        lean: vi.fn().mockResolvedValue({
           userId: 'user-alice',
           tenantId: 'tenant-alpha',
         }),
@@ -45,7 +45,7 @@ describe('AuthService', () => {
 
     it('should return null when no mapping exists', async () => {
       mockUserTenantModel.findOne.mockReturnValue({
-        lean: jest.fn().mockResolvedValue(null),
+        lean: vi.fn().mockResolvedValue(null),
       });
 
       const result = await service.findTenantByUserId('unknown-user');

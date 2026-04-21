@@ -3,7 +3,33 @@
     "allow": [
       "Bash(git checkout -b opsx/message-management-platform/search-and-tests)",
       "Bash(git add src/messages/messages.controller.ts src/messages/messages.module.ts src/messages/dto/search-messages-query.dto.ts src/messages/messages.service.spec.ts src/auth/auth.service.spec.ts src/auth/tenant.guard.spec.ts src/search/search.service.spec.ts openspec/changes/search-and-tests/ package.json)",
-      "Bash(git merge opsx/message-management-platform/search-and-tests)"
+      "Bash(git merge opsx/message-management-platform/search-and-tests)",
+      "Bash(git checkout -b opsp/integration-test-coverage)",
+      "Bash(git checkout -b opsx/integration-test-coverage/test-setup-layer)",
+      "Bash(git add test/integration/ test/jest-integration.json openspec/changes/test-setup-layer/ package.json package-lock.json)",
+      "Bash(git checkout opsp/integration-test-coverage)",
+      "Bash(git merge opsx/integration-test-coverage/test-setup-layer)",
+      "Bash(git checkout -b opsx/integration-test-coverage/integration-tests)",
+      "Bash(git add test/integration/auth.integration.spec.ts test/integration/messages.integration.spec.ts test/integration/search-pipeline.integration.spec.ts openspec/changes/integration-tests/)",
+      "Bash(git merge opsx/integration-test-coverage/integration-tests)",
+      "Bash(npm test -- --listTests)",
+      "Bash(npx openspec new change \"migrate-jest-to-vitest\")",
+      "Bash(for f in src/messages/messages.service.spec.ts src/auth/auth.service.spec.ts src/auth/tenant.guard.spec.ts src/search/search.service.spec.ts)",
+      "Bash(do sed -i '' 's/jest\\\\.fn/vi.fn/g; s/jest\\\\.mock/vi.mock/g; s/jest\\\\.clearAllMocks/vi.clearAllMocks/g; s/jest\\\\.Mock/vi.MockedFunction<any>/g' \"$f\")",
+      "Bash(ls /Users/ivanlee/Documents/git/tawk/node_modules/vitest/*.d.ts)",
+      "Bash(ls /Users/ivanlee/Documents/git/tawk/node_modules/vitest/dist/*.d.ts)",
+      "Read(//Users/ivanlee/.docker/**)",
+      "Read(//Applications/Docker.app/Contents/Resources/bin/**)",
+      "Bash(git checkout -b opsx/integration-test-coverage/configure-ci-pipeline)",
+      "Bash(git add .github/workflows/ci.yml openspec/changes/configure-ci-pipeline/ opensprint/initiatives/integration-test-coverage.md)",
+      "Bash(git merge opsx/integration-test-coverage/configure-ci-pipeline)",
+      "Bash(for change in auth-and-tenancy configure-ci-pipeline core-message-crud integration-tests kafka-es-indexing migrate-jest-to-vitest scaffold-and-infra search-and-tests test-setup-layer)",
+      "Bash(do mv \"/Users/ivanlee/Documents/git/tawk/openspec/changes/$change\" \"/Users/ivanlee/Documents/git/tawk/openspec/changes/archive/2026-04-21-$change\")",
+      "Bash(echo \"Archived: $change\")"
+    ],
+    "additionalDirectories": [
+      "/Users/ivanlee/Documents/git/tawk",
+      "/Users/ivanlee/Documents/git/tawk/openspec/changes"
     ]
   }
 }
