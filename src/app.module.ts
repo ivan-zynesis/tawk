@@ -6,6 +6,7 @@ import { validationSchema } from './config/validation.js';
 import { HealthModule } from './health/health.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { SeedModule } from './seed/seed.module.js';
+import { ConversationsModule } from './conversations/conversations.module.js';
 import { MessagesModule } from './messages/messages.module.js';
 import { SearchModule } from './search/search.module.js';
 
@@ -25,6 +26,7 @@ import { SearchModule } from './search/search.module.js';
     }),
     AuthModule,
     SeedModule,
+    ConversationsModule,
     MessagesModule,
     SearchModule,
     HealthModule,
