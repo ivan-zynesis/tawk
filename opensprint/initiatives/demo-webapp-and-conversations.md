@@ -1,7 +1,8 @@
 ---
 id: demo-webapp-and-conversations
-status: active
+status: complete
 created: 2026-04-21
+completed: 2026-04-21
 ---
 
 ## Description
@@ -21,6 +22,12 @@ Introduce conversations as a first-class entity and build a React + Vite demo fr
 
 ## Milestones
 
-- [ ] conversation-model: Conversation Mongoose schema, seed conversations per tenant, GET /api/conversations endpoint, validate conversation ownership on POST /api/messages
-- [ ] demo-frontend: React + Vite SPA with user picker, conversation list, message thread (paginated), send message, search
-- [ ] update-integration-tests: Update existing integration tests for conversation validation, add conversation listing test
+- [x] conversation-model: Conversation Mongoose schema, seed conversations per tenant, GET /api/conversations endpoint, validate conversation ownership on POST /api/messages (approved 2026-04-21)
+- [x] demo-frontend: React + Vite SPA with user picker, conversation list, message thread (paginated), send message, search (approved 2026-04-21)
+- [x] update-integration-tests: Update existing integration tests for conversation validation, add conversation listing test (approved 2026-04-21)
+
+## OPSX Changes
+
+- conversation-model
+- demo-frontend
+- update-integration-tests

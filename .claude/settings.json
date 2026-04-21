@@ -25,7 +25,19 @@
       "Bash(git merge opsx/integration-test-coverage/configure-ci-pipeline)",
       "Bash(for change in auth-and-tenancy configure-ci-pipeline core-message-crud integration-tests kafka-es-indexing migrate-jest-to-vitest scaffold-and-infra search-and-tests test-setup-layer)",
       "Bash(do mv \"/Users/ivanlee/Documents/git/tawk/openspec/changes/$change\" \"/Users/ivanlee/Documents/git/tawk/openspec/changes/archive/2026-04-21-$change\")",
-      "Bash(echo \"Archived: $change\")"
+      "Bash(echo \"Archived: $change\")",
+      "Bash(git checkout main)",
+      "Bash(git checkout -b opsp/demo-webapp-and-conversations)",
+      "Bash(git checkout -b opsx/demo-webapp-and-conversations/conversation-model)",
+      "Bash(git add src/conversations/ src/messages/messages.service.ts src/messages/messages.module.ts src/messages/messages.service.spec.ts src/seed/seed.service.ts src/seed/seed.module.ts src/app.module.ts openspec/changes/conversation-model/ opensprint/)",
+      "Bash(git checkout opsp/demo-webapp-and-conversations)",
+      "Bash(git merge opsx/demo-webapp-and-conversations/conversation-model)",
+      "Bash(git checkout -b opsx/demo-webapp-and-conversations/demo-frontend)",
+      "Bash(git add frontend/ openspec/changes/demo-frontend/ tsconfig.build.json)",
+      "Bash(git merge opsx/demo-webapp-and-conversations/demo-frontend)",
+      "Bash(git checkout -b opsx/demo-webapp-and-conversations/update-integration-tests)",
+      "Bash(git add test/integration/ openspec/changes/update-integration-tests/)",
+      "Bash(git merge opsx/demo-webapp-and-conversations/update-integration-tests)"
     ],
     "additionalDirectories": [
       "/Users/ivanlee/Documents/git/tawk",
