@@ -5,7 +5,7 @@ import { TestSetup, TestContext } from './helpers/test-setup';
 describe('Search Pipeline Integration (POST → Kafka → ES → Search)', () => {
   let ctx: TestContext;
   let aliceToken: string;
-  const conversationId = 'conv-search-pipeline';
+  const conversationId = 'conv-alpha-engineering';
 
   beforeAll(async () => {
     ctx = await TestSetup.create();

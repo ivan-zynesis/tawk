@@ -6,7 +6,7 @@ describe('Messages CRUD Integration', () => {
   let ctx: TestContext;
   let aliceToken: string;
   let charlieToken: string;
-  const conversationId = 'conv-crud-test';
+  const conversationId = 'conv-alpha-general';
 
   beforeAll(async () => {
     ctx = await TestSetup.create();
@@ -16,6 +16,30 @@ describe('Messages CRUD Integration', () => {
 
   afterAll(async () => {
     await ctx.teardown();
+  });
+
+  it('should reject messages to non-existent conversations', async () => {
+    await request(ctx.app.getHttpServer() as App)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${aliceToken}`)
+      .send({
+        conversationId: 'conv-does-not-exist',
+        senderId: 'user-alice',
+        body: 'hello',
+      })
+      .expect(404);
+  });
+
+  it('should reject messages to conversations of another tenant', async () => {
+    await request(ctx.app.getHttpServer() as App)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${aliceToken}`)
+      .send({
+        conversationId: 'conv-beta-general',
+        senderId: 'user-alice',
+        body: 'cross-tenant attempt',
+      })
+      .expect(404);
   });
 
   it('should validate required fields on POST', async () => {

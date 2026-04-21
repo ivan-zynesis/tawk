@@ -50,6 +50,38 @@ describe('Auth Integration', () => {
       .expect(403);
   });
 
+  it('should return tenant-scoped conversations', async () => {
+    const token = ctx.signToken('user-alice');
+
+    const res = await request(ctx.app.getHttpServer() as App)
+      .get('/api/conversations')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(res.body).toHaveLength(2);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(res.body.map((c: { name: string }) => c.name).sort()).toEqual([
+      '#engineering',
+      '#general',
+    ]);
+  });
+
+  it('should return different conversations for different tenants', async () => {
+    const token = ctx.signToken('user-charlie');
+
+    const res = await request(ctx.app.getHttpServer() as App)
+      .get('/api/conversations')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(200);
+
+    expect(res.body).toHaveLength(2);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(res.body.map((c: { name: string }) => c.name).sort()).toEqual([
+      '#general',
+      '#random',
+    ]);
+  });
+
   it('should accept requests from seeded users with valid JWT', async () => {
     const token = ctx.signToken('user-alice');
 
@@ -57,7 +89,7 @@ describe('Auth Integration', () => {
       .post('/api/messages')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        conversationId: 'conv-auth-test',
+        conversationId: 'conv-alpha-general',
         senderId: 'user-alice',
         body: 'authenticated message',
       })
