@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Kafka, Producer } from 'kafkajs';
@@ -6,6 +6,7 @@ import { ConfigService } from '@nestjs/config';
 import { ulid } from 'ulid';
 import { Message, MessageDocument } from './schemas/message.schema.js';
 import { CreateMessageDto } from './dto/create-message.dto.js';
+import { ConversationsService } from '../conversations/conversations.service.js';
 
 @Injectable()
 export class MessagesService {
@@ -16,6 +17,7 @@ export class MessagesService {
     @InjectModel(Message.name)
     private readonly messageModel: Model<MessageDocument>,
     private readonly configService: ConfigService,
+    private readonly conversationsService: ConversationsService,
   ) {
     const kafka = new Kafka({
       clientId: 'tawk-api',
@@ -36,6 +38,16 @@ export class MessagesService {
   }
 
   async create(tenantId: string, dto: CreateMessageDto): Promise<Message> {
+    const conversation = await this.conversationsService.findByIdAndTenant(
+      dto.conversationId,
+      tenantId,
+    );
+    if (!conversation) {
+      throw new NotFoundException(
+        `Conversation ${dto.conversationId} not found`,
+      );
+    }
+
     const message = new this.messageModel({
       id: ulid(),
       tenantId,

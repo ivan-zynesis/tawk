@@ -3,6 +3,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { MessagesService } from './messages.service.js';
 import { Message } from './schemas/message.schema.js';
+import { ConversationsService } from '../conversations/conversations.service.js';
 
 const mockProducer = {
   connect: vi.fn(),
@@ -70,6 +71,16 @@ describe('MessagesService', () => {
           provide: ConfigService,
           useValue: {
             get: vi.fn().mockReturnValue(['localhost:9092']),
+          },
+        },
+        {
+          provide: ConversationsService,
+          useValue: {
+            findByIdAndTenant: vi.fn().mockResolvedValue({
+              id: 'conv-1',
+              tenantId: 'tenant-alpha',
+              name: '#general',
+            }),
           },
         },
       ],
