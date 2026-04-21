@@ -7,9 +7,7 @@ import { ConversationsService } from './conversations.service.js';
 @Controller('conversations')
 @UseGuards(AuthGuard, TenantGuard)
 export class ConversationsController {
-  constructor(
-    private readonly conversationsService: ConversationsService,
-  ) {}
+  constructor(private readonly conversationsService: ConversationsService) {}
 
   @Get()
   async findAll(@CurrentTenant() tenantId: string) {

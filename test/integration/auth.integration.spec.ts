@@ -59,7 +59,7 @@ describe('Auth Integration', () => {
       .expect(200);
 
     expect(res.body).toHaveLength(2);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     expect(res.body.map((c: { name: string }) => c.name).sort()).toEqual([
       '#engineering',
       '#general',
@@ -75,7 +75,7 @@ describe('Auth Integration', () => {
       .expect(200);
 
     expect(res.body).toHaveLength(2);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     expect(res.body.map((c: { name: string }) => c.name).sort()).toEqual([
       '#general',
       '#random',
