@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { TestSetup, TestContext } from './helpers/test-setup.js';
+import { TestSetup, TestContext } from './helpers/test-setup';
 
 describe('Search Pipeline Integration (POST → Kafka → ES → Search)', () => {
   let ctx: TestContext;
@@ -43,6 +43,7 @@ describe('Search Pipeline Integration (POST → Kafka → ES → Search)', () =>
         .set('Authorization', `Bearer ${aliceToken}`)
         .expect(200);
 
+      /* eslint-disable @typescript-eslint/no-unsafe-member-access */
       if (res.body.length > 0) {
         expect(res.body[0].body).toContain(uniqueWord);
         expect(res.body[0].tenantId).toBe('tenant-alpha');

@@ -1,6 +1,6 @@
 # Architecture
 
-*Compiled from initiative `message-management-platform`, archived 2026-04-21.*
+*Compiled from initiatives `message-management-platform` and `integration-test-coverage`, archived 2026-04-21.*
 
 ## System Overview
 
@@ -36,12 +36,20 @@ We adopted best-effort Kafka publishing (DEC-002). The write path is: store in M
 
 Building on DEC-002, we use a single Kafka topic `message-created` partitioned by `conversationId` (DEC-004). This guarantees message ordering within a conversation — the most valuable ordering guarantee for a messaging system. A single consumer group (`search-indexer`) processes events into Elasticsearch. The risk of hot partitions from very active conversations is acceptable at current scale.
 
+**From DS-TECH-STACK**, the test tooling decisions follow:
+
+We use testcontainers for integration test infrastructure (DEC-005). A centralized `TestSetup` class orchestrates MongoDB, Kafka, and Elasticsearch containers per test suite, bootstrapping a fully wired NestJS test app. Tests are self-contained — no external `docker compose up` required. Containers start once per suite in `beforeAll` and tear down in `afterAll`.
+
+We chose Vitest with SWC as the test runner (DEC-006) over Jest + ts-jest. The project uses TypeScript `nodenext` moduleResolution which mandates `.js` extensions on imports. Jest runs in CommonJS and cannot resolve these extensions without fragile workarounds. Vitest runs natively in ESM, eliminating this impedance mismatch. SWC (via `unplugin-swc`) is required because NestJS relies on `emitDecoratorMetadata` which Vitest's default esbuild transform does not support.
+
 ```
 DS-MULTI-TENANT ──┬── DEC-001: Shared-infra multi-tenancy
                   └── DEC-003: JWT + user-tenant auth
 
-DS-TECH-STACK ────── DEC-002: Best-effort Kafka publish
-                        └── DEC-004: Single topic, partition by conversationId
+DS-TECH-STACK ──┬── DEC-002: Best-effort Kafka publish
+                │     └── DEC-004: Single topic, partition by conversationId
+                ├── DEC-005: Testcontainers-based integration testing
+                └── DEC-006: Vitest + SWC for test runner
 
 DS-MSG-SCHEMA ─────── (referenced by DEC-001 indexes, DEC-004 partition key)
 ```
@@ -104,6 +112,31 @@ DS-MSG-SCHEMA ─────── (referenced by DEC-001 indexes, DEC-004 part
 | GET | `/api/health` | Health check |
 
 All message endpoints require JWT authentication and are tenant-scoped.
+
+### Testing
+
+| Layer | Runner | Infrastructure | Scope |
+|---|---|---|---|
+| Unit tests (`src/**/*.spec.ts`) | Vitest + SWC | Mocked (vi.mock/vi.fn) | Service logic, guard behavior |
+| Integration tests (`test/integration/**/*.integration.spec.ts`) | Vitest + SWC | Testcontainers (real MongoDB, Kafka, ES) | Auth flow, CRUD, pagination, Kafka→ES pipeline |
+
+- **Vitest** runs natively in ESM with `globals: true` — no moduleNameMapper or separate tsconfig needed (DEC-006)
+- **SWC** (`unplugin-swc`) handles NestJS decorator metadata that esbuild cannot (DEC-006)
+- **TestSetup** orchestrates all three containers in parallel, pre-creates the `message-created` Kafka topic, and bootstraps the NestJS app with overridden connection URIs (DEC-005)
+- **Workspace projects** in `vitest.config.ts` separate unit and integration with independent timeouts and pool settings
+
+### CI Pipeline
+
+GitHub Actions workflow at `.github/workflows/ci.yml` runs on every PR to main and push to main:
+
+```
+Checkout → Node setup (.nvmrc) → npm ci → Lint → Build → Unit tests → Integration tests
+```
+
+- **Single sequential job** on `ubuntu-latest` — budget-conscious, all steps must pass
+- **Docker image caching** — testcontainer images (mongo:7, cp-kafka:7.5.0, es:8.11.0) saved as tarball via `actions/cache`, loaded on subsequent runs (~30s vs ~3min pull)
+- **`TESTCONTAINERS_RYUK_DISABLED=true`** — skip reaper on ephemeral GitHub runners
+- **Strict gating** — everything merged to main must have passed CI
 
 ## Constraints & Non-Negotiables
 

@@ -1,12 +1,10 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { MongoDBContainer, StartedMongoDBContainer } from '@testcontainers/mongodb';
-import { KafkaContainer, StartedKafkaContainer } from '@testcontainers/kafka';
-import {
-  ElasticsearchContainer,
-  StartedElasticsearchContainer,
-} from '@testcontainers/elasticsearch';
+import { Kafka } from 'kafkajs';
+import { MongoDBContainer } from '@testcontainers/mongodb';
+import { KafkaContainer } from '@testcontainers/kafka';
+import { ElasticsearchContainer } from '@testcontainers/elasticsearch';
 import { AppModule } from '../../../src/app.module.js';
 import { JWT_SECRET, signTestToken } from './jwt.helper.js';
 
@@ -21,27 +19,35 @@ export interface TestContext {
 }
 
 export class TestSetup {
-  private static mongoContainer: StartedMongoDBContainer;
-  private static kafkaContainer: StartedKafkaContainer;
-  private static esContainer: StartedElasticsearchContainer;
-
   static async create(): Promise<TestContext> {
     // Start all containers in parallel
     const [mongo, kafka, es] = await Promise.all([
       new MongoDBContainer('mongo:7').start(),
-      new KafkaContainer('confluentinc/cp-kafka:7.5.0').withKraft().start(),
-      new ElasticsearchContainer('docker.elastic.co/elasticsearch/elasticsearch:8.11.0')
-        .withPassword('testpass')
+      new KafkaContainer('confluentinc/cp-kafka:7.5.0')
+        .withKraft()
+        .withEnvironment({
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true',
+        })
+        .start(),
+      new ElasticsearchContainer(
+        'docker.elastic.co/elasticsearch/elasticsearch:8.11.0',
+      )
+        .withEnvironment({ 'xpack.security.enabled': 'false' })
         .start(),
     ]);
-
-    this.mongoContainer = mongo;
-    this.kafkaContainer = kafka;
-    this.esContainer = es;
 
     const mongoUri = mongo.getConnectionString() + '?directConnection=true';
     const kafkaBroker = `${kafka.getHost()}:${kafka.getMappedPort(9093)}`;
     const esUrl = es.getHttpUrl();
+
+    // Pre-create the message-created topic before NestJS consumer subscribes
+    const adminKafka = new Kafka({ brokers: [kafkaBroker] });
+    const admin = adminKafka.admin();
+    await admin.connect();
+    await admin.createTopics({
+      topics: [{ topic: 'message-created', numPartitions: 1 }],
+    });
+    await admin.disconnect();
 
     // Override env vars before NestJS bootstraps
     process.env['MONGODB_URI'] = mongoUri;
@@ -55,7 +61,9 @@ export class TestSetup {
 
     const app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     const jwtService = moduleFixture.get<JwtService>(JwtService);
@@ -69,11 +77,7 @@ export class TestSetup {
       signToken: (userId: string) => signTestToken(jwtService, userId),
       teardown: async () => {
         await app.close();
-        await Promise.all([
-          mongo.stop(),
-          kafka.stop(),
-          es.stop(),
-        ]);
+        await Promise.all([mongo.stop(), kafka.stop(), es.stop()]);
       },
     };
   }

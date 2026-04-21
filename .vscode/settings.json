@@ -1,0 +1,5 @@
+{
+  "vitest.nodeEnv": {
+    "PATH": "/Users/ivanlee/.nvm/versions/node/v20.20.2/bin:${env:PATH}"
+  }
+}

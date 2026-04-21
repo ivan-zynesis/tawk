@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { TestSetup, TestContext } from './helpers/test-setup.js';
+import { TestSetup, TestContext } from './helpers/test-setup';
 
 describe('Messages CRUD Integration', () => {
   let ctx: TestContext;
@@ -37,6 +37,7 @@ describe('Messages CRUD Integration', () => {
       })
       .expect(201);
 
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     expect(res.body.id).toBeDefined();
     expect(res.body.tenantId).toBe('tenant-alpha');
     expect(res.body.conversationId).toBe(conversationId);
@@ -84,6 +85,8 @@ describe('Messages CRUD Integration', () => {
 
     expect(page2.body.messages).toHaveLength(2);
     // Pages should not overlap
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
     const page1Ids = page1.body.messages.map((m: { id: string }) => m.id);
     const page2Ids = page2.body.messages.map((m: { id: string }) => m.id);
     expect(page1Ids).not.toEqual(expect.arrayContaining(page2Ids));

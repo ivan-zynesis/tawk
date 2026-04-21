@@ -1,3 +1,4 @@
+import { type Mock } from 'vitest';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { TenantGuard } from './tenant.guard.js';
 import { AuthService } from './auth.service.js';
@@ -7,8 +8,9 @@ describe('TenantGuard', () => {
   let authService: AuthService;
 
   beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     authService = {
-      findTenantByUserId: jest.fn(),
+      findTenantByUserId: vi.fn(),
     } as any;
     guard = new TenantGuard(authService);
   });
@@ -23,15 +25,15 @@ describe('TenantGuard', () => {
   }
 
   it('should attach tenantId to request when user has a tenant mapping', async () => {
-    (authService.findTenantByUserId as jest.Mock).mockResolvedValue(
-      'tenant-alpha',
-    );
+    (authService.findTenantByUserId as Mock).mockResolvedValue('tenant-alpha');
     const ctx = createMockContext({ userId: 'user-alice' });
 
     const result = await guard.canActivate(ctx);
 
     expect(result).toBe(true);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const request = ctx.switchToHttp().getRequest();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(request.tenantId).toBe('tenant-alpha');
   });
 
@@ -42,7 +44,7 @@ describe('TenantGuard', () => {
   });
 
   it('should throw ForbiddenException when user has no tenant mapping', async () => {
-    (authService.findTenantByUserId as jest.Mock).mockResolvedValue(null);
+    (authService.findTenantByUserId as Mock).mockResolvedValue(null);
     const ctx = createMockContext({ userId: 'orphan-user' });
 
     await expect(guard.canActivate(ctx)).rejects.toThrow(ForbiddenException);

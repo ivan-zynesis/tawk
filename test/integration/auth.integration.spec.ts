@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { TestSetup, TestContext } from './helpers/test-setup.js';
+import { TestSetup, TestContext } from './helpers/test-setup';
 
 describe('Auth Integration', () => {
   let ctx: TestContext;
@@ -63,7 +63,9 @@ describe('Auth Integration', () => {
       })
       .expect(201);
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(res.body.tenantId).toBe('tenant-alpha');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     expect(res.body.body).toBe('authenticated message');
   });
 });
